@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+import os
+import pymol
+import sys
+import urllib2
+
+# sys.argv : list of commnad line arguments
+argc = len( sys.argv )
+
+# if invalid argument
+if argc != 2 :
+    print "Show cartoon structure of given PDB ID using PyMOL"
+    print "Usage : " + os.path.basename( sys.argv[0] ) + " [pdbid]"
+    sys.exit( 2 )
+
+# set pdb_id
+pdb_id  = sys.argv[1]
+
+# if the length of pdb_id is not 4 ( if invalid pdb_id )
+if len( pdb_id ) != 4 :
+    sys.exit( "error : PDB ID must consist of 4 charactors." )
+
+
+# download pdb file
+PDBURL = "http://www.rcsb.org/pdb/download/downloadFile.do"
+optstr = "fileFormat=pdb&compression=NO&structureId=" + pdb_id
+try :
+    pdb    = urllib2.urlopen( PDBURL + "?" + optstr ).read()
+except urllib2.URLError :
+    sys.exit( "error : PDB ID " + pdb_id + " not found" )
+
+
+# run pymol
+pymol.finish_launching()
+pymol.cmd.read_pdbstr( pdb, pdb_id )
+pymol.cmd.hide( "everything" )
+pymol.cmd.show( "cartoon" )
+pymol.cmd.spectrum()
