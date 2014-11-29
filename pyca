@@ -56,26 +56,34 @@ if not os.path.isfile( file ) :
 # make CA model
 pdbdat = ""
 bonds  = []
-skip   = True
-last   = 0
-resnum = 1
+last   = 0              # residue number of last atom
+resnum = 0              # residue number of focus atom
 
 for line in open( file, 'r' ).readlines() :
 
-    # if not ATOM line
-    if not line[0:4] == 'ATOM':
-        continue
-    
-    # check atom type
-    if line[12:16] != " CA " :
+    # if not ATOM line or CA atom
+    if line[0:4] != 'ATOM' or line[12:16] != " CA ":
         continue
 
+    
+    # separete mode
+    if separate:
+        resnum  = int(line[22:26])
+    # if continuous mode
+    else:
+        resnum += 1
+
+        
     # add pdb line
     pdbdat += line[0:22] + ( '%4d' % resnum ) + line[26:]
-    resnum += 1
 
+    
     # add bonds
-    bonds.append( ( str(resnum - 2) + "/CA", str(resnum - 1) + "/CA" ) )
+    if last + 1 == resnum:
+        bonds.append( ( str(last) + "/CA", str(resnum) + "/CA" ) )
+
+    # update last residue number
+    last = resnum
 
 
 # launch pymol
@@ -85,12 +93,20 @@ pymol.finish_launching()
 pymol.cmd.read_pdbstr( pdbdat, os.path.basename( file ) ) 
 pymol.cmd.hide( 'everything' )
 
+# set bond information
 if mode == "stick" :
     for bond in bonds :
         pymol.cmd.bond( bond[0], bond[1] )
 else :
     pymol.cmd.set( "cartoon_trace", 1 )
 
+
+# display structure in 'mode'
 pymol.cmd.show( mode )
+
+
+# colorize the structure
+# blue : N-terminus
+# red  : C-terminus
 pymol.cmd.spectrum()
 
