@@ -60,6 +60,12 @@ def ca( mode, with_separate, filename ):
 
     # display structure in 'mode'
     pymol.cmd.show( mode )
+    
+    # colorize the structure
+    # blue : N-terminus
+    # red  : C-terminus
+    pymol.cmd.spectrum()
+
 
 ########################################## main ##############################################
 if __name__ == "__main__":
@@ -102,9 +108,4 @@ if __name__ == "__main__":
 
     # get options and Display in PyMOL
     ca( *opt() )
-
-    # colorize the structure
-    # blue : N-terminus
-    # red  : C-terminus
-    pymol.cmd.spectrum()
-
+    
