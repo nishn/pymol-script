@@ -3,9 +3,15 @@ pymol-script
 
 Python scripts for PyMOL
 
+### pym.py
+Display PDB structure in Cartoon
 
-### pyca
-Display PDB structure in CA backbone
+### pyca.py
+Display PDB structure in CA backbone trace  
 
-### pypdb
+### pypdb.py
 Download pdb file from www.rcsb.org and Display in cartoon
+
+### pycol.py
+Select the range of residue number and colorize the region.  
+Cartoon and CA trace mode are available.
