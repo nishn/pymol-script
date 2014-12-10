@@ -12,6 +12,7 @@ except :
     
 # import other pymol modules
 import pyca
+import pym
 
 def colorize( start, end, col ):
     select = col
@@ -49,6 +50,11 @@ if __name__ == "__main__":
                            action = "store", type = "string",
                            help = "Name of the color to use. [ default : white ]" )
 
+        # structure mode
+        parser.add_option( "--cartoon", dest = "cartoon", default = False,
+                           action = "store_true",
+                           help = "Show the structure in cartoon mode [ default : CA trace ]" )
+
         
         # parse arguments
         ( options, args ) = parser.parse_args()
@@ -60,7 +66,7 @@ if __name__ == "__main__":
                           "\t\tTo show help message, use '-h or --help' option." )
         if options.first == None or ( options.last == None and options.num == None ):
             parser.error( "Invalid argument. \n"
-                          "'-f' and '-l' or '-c' must be specified.\n"
+                          "'-f' and '-l' or '-n' must be specified.\n"
                           "To show help message, use '-h or --help' option." )
         return ( options, args )
 
@@ -69,5 +75,8 @@ if __name__ == "__main__":
         return ( options.first, last, options.color )
 
     ( options, args ) = opt()
-    pyca.ca( "stick", True, args[0] )
+    if options.cartoon:
+        pym.cartoon( args[0], None )
+    else:
+        pyca.ca( "stick", True, args[0], None )
     colorize( *opt_parse( options ) )
