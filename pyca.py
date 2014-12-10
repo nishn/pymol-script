@@ -12,14 +12,23 @@ except :
 ######################################## function ###########################################
 
 # make CA model
-def ca( mode, with_separate, filename ):
+def ca( mode, with_separate, filename, name ):
     pdbdat = ""             # PDB data string
     bonds  = []             # a list consists of pairs of connected CA atoms
     last   = 0              # residue number of last atom
     resnum = 0              # residue number of focus atom
 
+    # check if the filename is a path or pdb_string
+    if os.path.exists( filename ):
+        name   = os.path.basename( filename )
+        pdbstr = open( filename ).read().split('\n')
+    else:
+        pdbstr = filename.split('\n')
+
+
+
     # open the PDB_FILE and read data
-    for line in open( filename, 'r' ).readlines() :
+    for line in pdbstr:
         
         # if not ATOM line or CA atom
         if line[0:4] != 'ATOM' or line[12:16] != " CA ":
@@ -34,7 +43,7 @@ def ca( mode, with_separate, filename ):
 
         
         # add pdb line
-        pdbdat += line[0:22] + ( '%4d' % resnum ) + line[26:]
+        pdbdat += line[0:22] + ( '%4d' % resnum ) + line[26:] + "\n"
         
         
         # add bonds
@@ -46,9 +55,9 @@ def ca( mode, with_separate, filename ):
 
     # launch pymol
     pymol_argv = [ 'pymol', '-q' ]
-    
+
     pymol.finish_launching()
-    pymol.cmd.read_pdbstr( pdbdat, os.path.basename( filename ) ) 
+    pymol.cmd.read_pdbstr( pdbdat, name ) 
     pymol.cmd.hide( 'everything' )
 
     # set bond information
@@ -96,14 +105,14 @@ if __name__ == "__main__":
         if len( args ) != 1 :
             parser.error( "Incorrect number of arguments. "
                           "Just one PDB_FILE must be given. \n"
-                          "\t\tTo show help message, use '-h or --help' option." )
+                          "To show help message, use '-h or --help' option." )
 
         # check if "file" exists
         if not os.path.isfile( args[0] ) :
             sys.exit( "error : \"" + args[0] + "\" : no such file" )
 
             
-        return [ options.mode, options.separate, args[0] ]
+        return ( options.mode, options.separate, args[0], None )
     
 
     # get options and Display in PyMOL
